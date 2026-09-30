@@ -77,7 +77,7 @@ targets:
       product: OneSignalExtension
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.spoonerism.marrow.OneSignalNotificationServiceExtension
+        PRODUCT_BUNDLE_IDENTIFIER: com.spoonerism.marrow.onesignal
         PRODUCT_NAME: OneSignalNotificationServiceExtension
         GENERATE_INFOPLIST_FILE: 'YES'
         INFOPLIST_FILE: Support/OneSignalNotificationServiceExtension-Info.plist

@@ -10,6 +10,6 @@
 		<string>$(PRODUCT_MODULE_NAME).NotificationService</string>
 	</dict>
 	<key>OneSignal_app_groups_key</key>
-	<string>group.com.spoonerism.marrow.onesignal</string>
+	<string>group.com.spoonerism.marrow.onesignal.n87</string>
 </dict>
 </plist>
