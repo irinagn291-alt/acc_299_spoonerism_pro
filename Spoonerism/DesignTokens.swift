@@ -3,20 +3,20 @@ import SwiftUI
 /// SPEC section 7. The only place these hex values live — reach colours
 /// and the font family through here. Keep this file and its values.
 enum DesignTokens {
-    /// #FAF7F5
-    static let bg = Color(red: 0.980392, green: 0.968627, blue: 0.960784)
-    static let bgHex = "#FAF7F5"
-    /// #FEFEFD
-    static let surface = Color(red: 0.996078, green: 0.996078, blue: 0.992157)
-    static let surfaceHex = "#FEFEFD"
-    /// #392818
-    static let ink = Color(red: 0.223529, green: 0.156863, blue: 0.094118)
-    static let inkHex = "#392818"
-    /// #CC6D19
-    static let accent = Color(red: 0.800000, green: 0.427451, blue: 0.098039)
-    static let accentHex = "#CC6D19"
-    /// #816C5A
-    static let muted = Color(red: 0.505882, green: 0.423529, blue: 0.352941)
-    static let mutedHex = "#816C5A"
+    /// #424714
+    static let bg = Color(red: 0.258824, green: 0.278431, blue: 0.078431)
+    static let bgHex = "#424714"
+    /// #656B30
+    static let surface = Color(red: 0.396078, green: 0.419608, blue: 0.188235)
+    static let surfaceHex = "#656B30"
+    /// #FFF6FC
+    static let ink = Color(red: 1, green: 0.964706, blue: 0.988235)
+    static let inkHex = "#FFF6FC"
+    /// #E8FF2E
+    static let accent = Color(red: 0.909804, green: 1, blue: 0.180392)
+    static let accentHex = "#E8FF2E"
+    /// #D5DB9E
+    static let muted = Color(red: 0.835294, green: 0.858824, blue: 0.619608)
+    static let mutedHex = "#D5DB9E"
     static let fontFamily = "SF Pro"
 }

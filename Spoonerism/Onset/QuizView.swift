@@ -196,11 +196,26 @@ struct QuizView: View {
         )
     }
 
+    private var crossedOpenings: String? {
+        guard let line = desk.onset.line else { return nil }
+        switch line.openSwapped.count {
+        case 0:
+            return "Both openings read straight."
+        case 1:
+            return "One opening is still crossed."
+        default:
+            return "Two openings are still crossed."
+        }
+    }
+
     private func jobLine(textWidth: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: MarrowSpace.inner) {
             readable(MarrowCopy.verb(sign: desk.onset.sign), step: .display, width: textWidth)
                 .accessibilityAddTraits(.isHeader)
             readable(MarrowCopy.nextTap(sign: desk.onset.sign), step: .body, width: textWidth)
+            if let crossed = crossedOpenings {
+                readable(crossed, step: .caption, width: textWidth)
+            }
         }
         .frame(width: textWidth, alignment: .leading)
     }

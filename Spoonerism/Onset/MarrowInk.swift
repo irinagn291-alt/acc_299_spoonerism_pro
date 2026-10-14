@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// Role: Onset. Named colours from Assets.xcassets. Hex lives only in this accessor: #FAF7F5 #FEFEFD #392818 #CC6D19 #816C5A.
+/// Role: Onset. Named colours from Assets.xcassets. Hex lives only in this accessor: #424714 #656B30 #FFF6FC #E8FF2E #D5DB9E.
 enum MarrowInk {
     enum Hex {
-        static let background = "#FAF7F5"
-        static let surface = "#FEFEFD"
-        static let ink = "#392818"
-        static let accent = "#CC6D19"
-        static let muted = "#816C5A"
+        static let background = "#424714"
+        static let surface = "#656B30"
+        static let ink = "#FFF6FC"
+        static let accent = "#E8FF2E"
+        static let muted = "#D5DB9E"
     }
 
     static var background: Color { Color("background") }
