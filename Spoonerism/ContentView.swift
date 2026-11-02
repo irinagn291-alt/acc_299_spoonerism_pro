@@ -15,11 +15,12 @@ struct ContentView: View {
         ZStack {
             MarrowInk.background.ignoresSafeArea()
             if desk.isBooting {
-                Image(MarrowArt.splash)
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-                    .accessibilityHidden(true)
+                VStack(spacing: 20) {
+                    Text("Spoonerism")
+                        .font(.system(.largeTitle, design: .serif))
+                        .foregroundStyle(MarrowInk.ink)
+                    ProgressView().tint(MarrowInk.accent)
+                }
             } else if desk.showsOnboarding {
                 OnboardingView(
                     onSkip: { Task { await desk.finishOnboarding() } },

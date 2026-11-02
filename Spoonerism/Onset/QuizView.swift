@@ -1,292 +1,206 @@
 import SwiftUI
 
-/// Role: Onset. Locked Quiz. The spoonered Line never leaves. Explore, Saved, and Settings arrive as sheets. Spoon and mend fuse here.
+/// The active round stays on screen while the gallery and collection open as sheets.
 struct QuizView: View {
     @Bindable var desk: OnsetDesk
-    @Environment(\.dynamicTypeSize) private var typeSize
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        Group {
-            if desk.quizIsEmpty {
-                idlePage
-            } else {
-                populated
-            }
-        }
-        .background(MarrowInk.background.ignoresSafeArea())
-        .sensoryFeedback(.impact(weight: .medium), trigger: desk.mendPulse)
-        .animation(MarrowMotion.snap(reduceMotion), value: desk.onset.sign)
-        .animation(MarrowMotion.snap(reduceMotion), value: desk.onset.line?.workID)
-        .sheet(item: compactCover) { cover in
-            coverView(cover)
-        }
-        .fullScreenCover(item: regularCover) { cover in
-            coverView(cover)
-        }
-    }
-
-    private var idlePage: some View {
-        GeometryReader { geo in
-            let textWidth = max(geo.size.width - MarrowSpace.outer * 2, MarrowSpace.hit)
-            VStack(alignment: .leading, spacing: 0) {
-                jobLine(textWidth: textWidth)
-                    .padding(.horizontal, MarrowSpace.outer)
-                    .padding(.top, MarrowSpace.inner)
-                FluentView(
-                    headline: desk.recoveredNotice ? MarrowCopy.recoverHeadline : MarrowCopy.fluentHeadline,
-                    line: desk.recoveredNotice ? MarrowCopy.recoverLine : MarrowCopy.fluentLine,
-                    actionTitle: "Browse"
-                ) {
-                    desk.present(.explore)
-                }
-            }
-            .frame(width: geo.size.width, height: geo.size.height, alignment: .topLeading)
-        }
-    }
-
-    private var populated: some View {
-        GeometryReader { geo in
-            let pageWidth = geo.size.width
-            let textWidth = max(pageWidth - MarrowSpace.outer * 2, MarrowSpace.hit)
-            ViewThatFits(in: .vertical) {
-                populatedColumn(textWidth: textWidth, pageHeight: geo.size.height, heroFills: true)
-                ScrollView(.vertical) {
-                    populatedColumn(textWidth: textWidth, pageHeight: geo.size.height, heroFills: false)
-                }
-                .scrollIndicators(.hidden)
-            }
-            .frame(width: pageWidth, height: geo.size.height, alignment: .topLeading)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-
-    private func populatedColumn(textWidth: CGFloat, pageHeight: CGFloat, heroFills: Bool) -> some View {
-        VStack(alignment: .leading, spacing: MarrowSpace.gap) {
-            jobLine(textWidth: textWidth)
-            notices(textWidth: textWidth)
-            QuizTile(
-                work: desk.displayedWork,
-                showSuccess: desk.showSuccess
-            )
-            .frame(width: textWidth)
-            .frame(maxHeight: heroFills ? .infinity : nil)
-            .frame(height: heroFills ? nil : max(pageHeight * 0.46, MarrowSpace.step(28)))
-            .frame(minHeight: MarrowSpace.step(28))
-            .layoutPriority(heroFills ? 1 : 0)
-            .clipped()
-            captionUnderTile(textWidth: textWidth)
-            LineView(desk: desk)
-                .frame(width: textWidth, alignment: .leading)
-            fusedVerbs
-                .frame(width: textWidth, alignment: .leading)
-            MendMarkRail(desk: desk, columnWidth: textWidth)
-                .frame(width: textWidth, alignment: .leading)
-            wordLinks(textWidth: textWidth)
-        }
-        .padding(.horizontal, MarrowSpace.outer)
-        .padding(.top, MarrowSpace.inner)
-        .padding(.bottom, MarrowSpace.card)
-        .frame(width: pageWidth(textWidth: textWidth), alignment: .topLeading)
-        .frame(maxHeight: heroFills ? pageHeight : nil, alignment: .topLeading)
-    }
-
-    private func pageWidth(textWidth: CGFloat) -> CGFloat {
-        textWidth + MarrowSpace.outer * 2
-    }
-
-    private func captionUnderTile(textWidth: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: MarrowSpace.inner) {
-            readable(
-                desk.displayedWork?.title ?? "Painting",
-                step: .title,
-                width: textWidth
-            )
-            readable(
-                desk.displayedWork?.artist ?? "Maker",
-                step: .body,
-                width: textWidth
-            )
-            readable(
-                "\(MarrowFigures.daykey(desk.dayStamp)) · \(MarrowCopy.signLabel(desk.onset.sign))",
-                step: .caption,
-                width: textWidth
-            )
-        }
-        .frame(width: textWidth, alignment: .leading)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(captionVoice)
-    }
-
-    private var captionVoice: String {
-        let title = desk.displayedWork?.title ?? "Painting"
-        let artist = desk.displayedWork?.artist ?? "Maker"
-        return "\(title), \(artist), \(MarrowCopy.signLabel(desk.onset.sign))"
-    }
-
-    @ViewBuilder
-    private func notices(textWidth: CGFloat) -> some View {
-        if let fault = desk.onsetFault {
-            HStack(alignment: .center, spacing: MarrowSpace.gap) {
-                Text(fault)
-                    .font(MarrowType.font(.caption, size: typeSize))
-                    .foregroundStyle(MarrowInk.ink)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(4)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Button("Retry") {
-                    Task { await desk.flush() }
-                }
-                .font(MarrowType.font(.caption, size: typeSize))
-                .foregroundStyle(MarrowInk.ink)
-                .marrowHit()
-                .buttonStyle(MarrowGlyphStyle())
-                .accessibilityLabel("Retry")
-            }
-            .padding(MarrowSpace.card)
-            .frame(width: textWidth, alignment: .leading)
-            .marrowFlat()
-        }
-        if desk.recoveredNotice {
-            wrapped(MarrowCopy.recoverLine, step: .caption, width: textWidth, limit: 4)
-                .padding(MarrowSpace.card)
-                .frame(width: textWidth, alignment: .leading)
-                .marrowFlat()
-        }
-    }
-
-    private var fusedVerbs: some View {
-        HStack(alignment: .center, spacing: MarrowSpace.gap) {
-            if desk.onset.sign != .spooned {
-                Button {
-                    Task { await desk.spoonWork() }
-                } label: {
-                    HStack(spacing: MarrowSpace.inner) {
-                        Image(MarrowArt.controlFace)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: MarrowSpace.step(3), height: MarrowSpace.step(3))
-                            .accessibilityHidden(true)
-                        Text("Spoon")
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    masthead
+                    if desk.quizIsEmpty {
+                        FluentView(
+                            headline: desk.recoveredNotice ? MarrowCopy.recoverHeadline : "Art with a twist.",
+                            line: "Save a painting from the gallery. Then put its words back in order.",
+                            actionTitle: "Explore the gallery"
+                        ) { desk.present(.explore) }
+                        .frame(minHeight: 420)
+                    } else {
+                        introduction
+                        if let fault = desk.onsetFault {
+                            Label(fault, systemImage: "exclamationmark.circle")
+                                .font(.footnote)
+                                .foregroundStyle(MarrowInk.ink)
+                                .padding(16)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .marrowFlat()
+                            Button("Retry") { Task { await desk.flush() } }
+                                .buttonStyle(MarrowPillStyle(tone: .quiet))
+                        }
+                        if desk.recoveredNotice {
+                            Text(MarrowCopy.recoverLine).font(.footnote).foregroundStyle(MarrowInk.muted)
+                        }
+                        if geometry.size.width >= 700 {
+                            HStack(alignment: .top, spacing: 32) {
+                                painting(height: min(geometry.size.height * 0.55, 480))
+                                    .frame(maxWidth: .infinity)
+                                roundPanel
+                                    .frame(maxWidth: .infinity)
+                            }
+                        } else {
+                            painting(height: min(max(geometry.size.height * 0.27, 140), 300))
+                            roundPanel
+                        }
+                        MendMarkRail(desk: desk, columnWidth: min(geometry.size.width - 40, 1000))
                     }
                 }
-                .buttonStyle(MarrowPillStyle(tone: .spoon, isLoading: desk.spoonBusy))
-                .disabled(!desk.spoonEnabled)
-                .accessibilityHint("Draws a painting that is not filed yet and paints its words.")
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 24)
+                .frame(maxWidth: 1040)
+                .frame(maxWidth: .infinity)
             }
+            .scrollIndicators(.hidden)
+        }
+        .background(MarrowInk.background.ignoresSafeArea())
+        .safeAreaInset(edge: .bottom, spacing: 0) { navigation }
+        .sensoryFeedback(.impact(weight: .medium), trigger: desk.mendPulse)
+        .animation(MarrowMotion.snap(reduceMotion), value: desk.onset.sign)
+        .sheet(item: compactCover) { coverView($0) }
+        .fullScreenCover(item: regularCover) { coverView($0) }
+    }
 
-            Button {
-                Task { await desk.undoNewest() }
-            } label: {
-                Image(systemName: "arrow.uturn.backward")
-                    .font(MarrowType.font(.headline, size: typeSize))
-                    .foregroundStyle(MarrowInk.ink)
-                    .frame(minWidth: MarrowSpace.hit, minHeight: MarrowSpace.hit)
-                    .contentShape(Rectangle())
+    private var masthead: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "textformat.abc")
+                .font(.system(size: 20, weight: .medium, design: .serif))
+                .foregroundStyle(MarrowInk.surface)
+                .frame(width: 42, height: 42)
+                .background(MarrowInk.accent, in: RoundedRectangle(cornerRadius: 13))
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Spoonerism").font(.system(.headline, design: .serif))
+                Text("THE ART OF WORDPLAY")
+                    .font(.caption2.weight(.semibold)).tracking(1.2)
+                    .foregroundStyle(MarrowInk.muted)
+            }
+            Spacer(minLength: 0)
+            Button { desk.present(.spoonMend) } label: {
+                Image(systemName: "questionmark")
+                    .font(.system(size: 15, weight: .medium))
+                    .frame(width: 44, height: 44)
             }
             .buttonStyle(MarrowGlyphStyle())
-            .disabled(!desk.undoEnabled)
-            .accessibilityLabel("Undo")
-            .accessibilityHint(MarrowCopy.undoHint)
+            .accessibilityLabel("How it works")
         }
-        .frame(
-            maxWidth: .infinity,
-            alignment: desk.onset.sign == .spooned ? .trailing : .center
-        )
+        .foregroundStyle(MarrowInk.ink)
     }
 
-    private var crossedOpenings: String? {
-        guard let line = desk.onset.line else { return nil }
-        switch line.openSwapped.count {
-        case 0:
-            return "Both openings read straight."
-        case 1:
-            return "One opening is still crossed."
-        default:
-            return "Two openings are still crossed."
-        }
-    }
-
-    private func jobLine(textWidth: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: MarrowSpace.inner) {
-            readable(MarrowCopy.verb(sign: desk.onset.sign), step: .display, width: textWidth)
+    private var introduction: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Circle().fill(MarrowInk.accent).frame(width: 6, height: 6)
+                Text(desk.onset.sign == .mended ? "ROUND COMPLETE" : "YOUR DAILY WORDPLAY")
+                    .font(.system(.caption2).weight(.semibold)).tracking(1.5)
+                    .foregroundStyle(MarrowInk.accent)
+            }
+            Text(MarrowCopy.verb(sign: desk.onset.sign))
+                .font(.system(.largeTitle, design: .serif).weight(.medium))
+                .foregroundStyle(MarrowInk.ink)
                 .accessibilityAddTraits(.isHeader)
-            readable(MarrowCopy.nextTap(sign: desk.onset.sign), step: .body, width: textWidth)
-            if let crossed = crossedOpenings {
-                readable(crossed, step: .caption, width: textWidth)
+            Text(MarrowCopy.nextTap(sign: desk.onset.sign))
+                .font(.subheadline)
+                .foregroundStyle(MarrowInk.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func painting(height: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            QuizTile(work: desk.displayedWork, showSuccess: desk.showSuccess)
+                .frame(height: height)
+                .clipped()
+            VStack(alignment: .leading, spacing: 5) {
+                Text(desk.displayedWork?.title ?? "Painting")
+                    .font(.system(.title3, design: .serif).weight(.medium))
+                    .foregroundStyle(MarrowInk.ink)
+                Text([desk.displayedWork?.artist, desk.displayedWork?.dated].compactMap { $0 }.joined(separator: " · "))
+                    .font(.caption)
+                    .foregroundStyle(MarrowInk.muted)
+            }
+            .padding(16)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(MarrowInk.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(MarrowInk.ink.opacity(0.06)))
+    }
+
+    private var roundPanel: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            LineView(desk: desk)
+            HStack(spacing: 12) {
+                Label(desk.onset.sign == .mended ? "Beautifully untangled." : "Tap a word to test its first letter.",
+                      systemImage: desk.onset.sign == .mended ? "checkmark.circle.fill" : "hand.tap")
+                    .font(.caption)
+                    .foregroundStyle(MarrowInk.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                Button { Task { await desk.undoNewest() } } label: {
+                    Image(systemName: "arrow.uturn.backward").frame(width: 44, height: 44)
+                }
+                .buttonStyle(MarrowGlyphStyle())
+                .foregroundStyle(MarrowInk.ink)
+                .disabled(!desk.undoEnabled)
+                .accessibilityLabel("Undo")
+                .accessibilityHint(MarrowCopy.undoHint)
+            }
+            if desk.onset.sign != .spooned {
+                Button { Task { await desk.spoonWork() } } label: {
+                    Label("Next painting", systemImage: "arrow.right")
+                }
+                .buttonStyle(MarrowPillStyle(isLoading: desk.spoonBusy))
+                .disabled(!desk.spoonEnabled)
             }
         }
-        .frame(width: textWidth, alignment: .leading)
     }
 
-    private func wordLinks(textWidth: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: MarrowSpace.gap) {
-            wordChrome("How it works") { desk.present(.spoonMend) }
-            wordChrome("Browse") { desk.present(.explore) }
-            wordChrome("Kept") { desk.present(.saved) }
-            wordChrome("Settings") { desk.present(.settings) }
+    private var navigation: some View {
+        HStack(spacing: 0) {
+            navigationItem("Play", symbol: "rectangle.on.rectangle", selected: true) { }
+            navigationItem("Gallery", symbol: "square.grid.2x2") { desk.present(.explore) }
+            navigationItem("Collection", symbol: "bookmark") { desk.present(.saved) }
+            navigationItem("Settings", symbol: "slider.horizontal.3") { desk.present(.settings) }
         }
-        .frame(width: textWidth, alignment: .leading)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .frame(maxWidth: .infinity)
+        .background(MarrowInk.surface.ignoresSafeArea(edges: .bottom))
+        .overlay(alignment: .top) { Rectangle().fill(MarrowInk.ink.opacity(0.08)).frame(height: 1) }
     }
 
-    private func readable(_ text: String, step: MarrowType.Step, width: CGFloat) -> some View {
-        Text(text)
-            .font(MarrowType.font(step, size: typeSize))
-            .foregroundStyle(MarrowInk.ink)
-            .multilineTextAlignment(.leading)
-            .lineLimit(4)
-            .frame(width: max(width, MarrowSpace.hit), alignment: .leading)
-    }
-
-    private func wrapped(_ text: String, step: MarrowType.Step, width: CGFloat, limit: Int) -> some View {
-        Text(text)
-            .font(MarrowType.font(step, size: typeSize))
-            .foregroundStyle(MarrowInk.ink)
-            .multilineTextAlignment(.leading)
-            .lineLimit(limit)
-            .frame(width: max(width, MarrowSpace.hit), alignment: .leading)
-    }
-
-    private func wordChrome(_ title: String, action: @escaping () -> Void) -> some View {
+    private func navigationItem(_ title: String, symbol: String, selected: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title)
-                .font(MarrowType.font(.caption, size: typeSize))
-                .foregroundStyle(MarrowInk.ink)
-                .lineLimit(1)
-                .frame(minHeight: MarrowSpace.hit, alignment: .leading)
-                .padding(.horizontal, MarrowSpace.card)
-                .contentShape(RoundedRectangle(cornerRadius: MarrowRadius.chip, style: .continuous))
+            VStack(spacing: 5) {
+                Image(systemName: symbol).font(.system(size: 19, weight: selected ? .semibold : .regular))
+                Text(title).font(.caption2.weight(selected ? .semibold : .medium))
+            }
+            .foregroundStyle(selected ? MarrowInk.accent : MarrowInk.muted)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .contentShape(Rectangle())
         }
-        .buttonStyle(MarrowGlyphStyle())
-        .accessibilityLabel(title)
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     @ViewBuilder
     private func coverView(_ cover: MarrowCover) -> some View {
         switch cover {
-        case .explore:
-            ExploreView(desk: desk)
-        case .saved:
-            SavedView(desk: desk)
-        case .settings:
-            SettingsView(desk: desk)
-        case .spoonMend:
-            SpoonMendSheet(desk: desk)
+        case .explore: ExploreView(desk: desk)
+        case .saved: SavedView(desk: desk)
+        case .settings: SettingsView(desk: desk)
+        case .spoonMend: SpoonMendSheet(desk: desk)
         }
     }
 
     private var compactCover: Binding<MarrowCover?> {
-        Binding(
-            get: { sizeClass == .regular ? nil : desk.cover },
-            set: { desk.cover = $0 }
-        )
+        Binding(get: { sizeClass == .regular ? nil : desk.cover }, set: { desk.cover = $0 })
     }
 
     private var regularCover: Binding<MarrowCover?> {
-        Binding(
-            get: { sizeClass == .regular ? desk.cover : nil },
-            set: { desk.cover = $0 }
-        )
+        Binding(get: { sizeClass == .regular ? desk.cover : nil }, set: { desk.cover = $0 })
     }
 }

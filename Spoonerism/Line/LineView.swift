@@ -21,10 +21,9 @@ struct LineView: View {
     private func liveLine(_ line: Line) -> some View {
         VStack(alignment: .leading, spacing: MarrowSpace.inner) {
             fieldChip(line.field)
-            VStack(alignment: .leading, spacing: MarrowSpace.gap) {
+            HeadFlow(spacing: 8) {
                 ForEach(line.heads) { head in
                     seatButton(head)
-                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -45,10 +44,9 @@ struct LineView: View {
     private func settledLine(_ line: Line) -> some View {
         VStack(alignment: .leading, spacing: MarrowSpace.inner) {
             fieldChip(line.field)
-            VStack(alignment: .leading, spacing: MarrowSpace.gap) {
+            HeadFlow(spacing: 8) {
                 ForEach(line.heads) { head in
                     seatedReadout(head)
-                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -67,11 +65,10 @@ struct LineView: View {
     }
 
     private func fieldChip(_ field: LineField) -> some View {
-        Text(MarrowCopy.fieldLabel(field))
-            .font(MarrowType.font(.title, size: typeSize))
-            .foregroundStyle(MarrowInk.ink)
+        Text("FIND THE SWAPPED WORD · " + MarrowCopy.fieldLabel(field).uppercased())
+            .font(MarrowType.font(.micro, size: typeSize).weight(.semibold))
+            .foregroundStyle(MarrowInk.muted)
             .lineLimit(2)
-            .minimumScaleFactor(0.7)
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityLabel("Field, \(MarrowCopy.fieldLabel(field))")
     }

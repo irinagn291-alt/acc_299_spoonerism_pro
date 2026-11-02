@@ -4,6 +4,7 @@ import Foundation
 struct Shelf: Sendable {
     var rows: [CatalogRow]
 
+    // These accessions are persisted legacy identifiers; keep them stable for saved games.
     static let bundled = Shelf(rows: Self.makeRows())
 
     private static func makeRows() -> [CatalogRow] {
@@ -13,7 +14,7 @@ struct Shelf: Sendable {
                 "Diego Velazquez",
                 "Las Meninas",
                 "1656",
-                "Las Meninas, by Diego Velazquez, from Prado in Google Earth.jpg"
+                "Las Meninas, by Diego Velázquez, from Prado in Google Earth.jpg"
             ),
             row(
                 "Q753175",
@@ -41,42 +42,42 @@ struct Shelf: Sendable {
                 "Francisco Goya",
                 "Saturn Devouring His Son",
                 "1823",
-                "Saturn devouring his son.jpg"
+                "Francisco de Goya y Lucientes - Saturn Devouring One of his Children - WGA10109.jpg"
             ),
             row(
                 "Q475678",
                 "Francisco Goya",
                 "The Nude Maja",
                 "1800",
-                "Goya Maja nuda.jpg"
+                "Francisco de Goya y Lucientes - The Nude Maja (La Maja Desnuda) - WGA10044.jpg"
             ),
             row(
                 "Q2277040",
                 "El Greco",
                 "The Nobleman with his Hand on his Chest",
                 "1580",
-                "El Greco - Nobleman with his Hand on his Chest.jpg"
+                "El Greco - Nobleman with his Hand on his Chest - WGA10463.jpg"
             ),
             row(
                 "Q1252016",
                 "Rogier van der Weyden",
                 "The Descent from the Cross",
                 "1435",
-                "Descent from the Cross van der Weyden.jpg"
+                "Rogier van der Weyden 016.jpg"
             ),
             row(
                 "Q1242480",
                 "Diego Velazquez",
                 "The Spinners",
                 "1657",
-                "Las Hilanderas by Diego Velazquez.jpg"
+                "Les fileuses.jpg"
             ),
             row(
                 "Q2393085",
                 "Titian",
                 "Equestrian Portrait of Charles V",
                 "1548",
-                "Titian - Equestrian Portrait of Charles V.jpg"
+                "Tizian karl v.jpg"
             ),
         ]
     }

@@ -6,8 +6,9 @@ final class SpoonerismTests: XCTestCase {
         XCTAssertEqual(String(describing: SpoonerismApp.self), "SpoonerismApp")
     }
 
-    func test_homeCopyNamesTheJobWithoutEmDash() {
-        XCTAssertEqual(MarrowCopy.spoonedJob, "Tap the swapped word")
+    func test_homeCopyExplainsTheRoundWithoutEmDash() {
+        XCTAssertEqual(MarrowCopy.spoonedJob, "A little twist.")
+        XCTAssertTrue(MarrowCopy.spoonedNext.contains("Find a swapped word"))
         XCTAssertLessThanOrEqual(MarrowCopy.spoonedJob.split(separator: " ").count, 4)
         XCTAssertEqual(MarrowCopy.verb(sign: .spooned), MarrowCopy.spoonedJob)
         XCTAssertEqual(MarrowCopy.nextTap(sign: .spooned), MarrowCopy.spoonedNext)

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Role: Onset. Snap press and sheet travel. Reduce Motion keeps fade and drops the 0.97 scale.
 enum MarrowSnap {
@@ -48,8 +49,8 @@ enum MarrowCopy {
     static let exploreEmptyLine = "Search Prado, then save a work."
     static let savedEmptyHeadline = "Nothing filed yet."
     static let savedEmptyLine = "Tap a word that swapped its first letter."
-    static let spoonedJob = "Tap the swapped word"
-    static let spoonedNext = "A first letter moved. Tap that word."
+    static let spoonedJob = "A little twist."
+    static let spoonedNext = "Two first letters traded places. Find a swapped word."
     static let writeFailed = "Write failed. Try that tap again."
     static let recoverHeadline = "The save could not be read."
     static let recoverLine = "The save could not be read. A quiet start is up."
@@ -79,7 +80,7 @@ enum MarrowCopy {
         case .fluent:
             return fluentLine
         case .idle:
-            return "Maker or title will paint as words."
+            return "Start a round with an artist or a painting title."
         case .spooned:
             return spoonedNext
         case .mended:
@@ -98,7 +99,7 @@ enum MarrowCopy {
 
     static func fieldLabel(_ field: LineField) -> String {
         switch field {
-        case .artist: return "Maker"
+        case .artist: return "Artist"
         case .title: return "Title"
         }
     }
@@ -214,7 +215,7 @@ private struct MarrowPillBody: View {
         .font(MarrowType.font(.headline, size: typeSize))
         .foregroundStyle(labelInk)
         .frame(maxWidth: .infinity)
-        .frame(minHeight: MarrowSpace.hit)
+        .frame(minHeight: 52)
         .padding(.horizontal, MarrowSpace.card)
         .background(fill, in: RoundedRectangle(cornerRadius: MarrowRadius.card, style: .continuous))
         .overlay(
@@ -243,8 +244,10 @@ private struct MarrowPillBody: View {
 
     private var labelInk: Color {
         switch tone {
-        case .spoon, .wipe:
+        case .spoon:
             return MarrowInk.surface
+        case .wipe:
+            return MarrowInk.background
         case .quiet:
             return MarrowInk.ink
         }
@@ -345,10 +348,19 @@ struct MarrowSheetHost<Content: View>: View {
 struct MarrowThumb: View {
     var url: URL?
     var side: CGFloat
+    var objectID: String? = nil
+
+    private var localName: String? {
+        if let objectID { return "painting_" + objectID }
+        guard let url, let row = Shelf.bundled.rows.first(where: { $0.imageURL == url }) else { return nil }
+        return "painting_" + row.objectID
+    }
 
     var body: some View {
         Group {
-            if let url {
+            if let localName, UIImage(named: localName) != nil {
+                Image(localName).resizable().scaledToFill()
+            } else if let url {
                 AsyncImage(url: url) { phase in
                     switch phase {
                     case .success(let image):
@@ -386,5 +398,63 @@ extension Image {
             .frame(maxWidth: maxWidth, maxHeight: maxHeight)
             .clipped()
             .accessibilityHidden(true)
+    }
+}
+
+/// Native artwork used by onboarding, help and empty states.
+struct MarrowIllustration: View {
+    var page: Int = 0
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 28).fill(MarrowInk.accent.opacity(0.07))
+            if page == 0 {
+                Image("painting_Q186685")
+                    .resizable().scaledToFit()
+                    .padding(16)
+                    .background(MarrowInk.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .rotationEffect(.degrees(-7))
+                    .padding(24)
+                    .overlay(alignment: .bottomTrailing) {
+                        Image(systemName: "bookmark.fill")
+                            .font(.title2).foregroundStyle(MarrowInk.surface)
+                            .frame(width: 56, height: 56)
+                            .background(MarrowInk.accent, in: Circle())
+                            .padding(24)
+                    }
+            } else if page == 1 {
+                VStack(spacing: 16) {
+                    HStack(spacing: 12) {
+                        letter("A", angle: -8)
+                        Image(systemName: "arrow.left.arrow.right")
+                            .font(.title2).foregroundStyle(MarrowInk.accent)
+                        letter("B", angle: 8)
+                    }
+                    Text("A small switch. A fresh perspective.")
+                        .font(.caption).foregroundStyle(MarrowInk.muted)
+                }
+                .padding(16)
+            } else {
+                VStack(spacing: 16) {
+                    Image(systemName: "checkmark.seal")
+                        .font(.system(size: 76, weight: .ultraLight))
+                        .foregroundStyle(MarrowInk.accent)
+                    Text("A work of art. A word restored.")
+                        .font(.system(.headline, design: .serif)).foregroundStyle(MarrowInk.ink)
+                }
+                .padding(16)
+            }
+        }
+        .frame(height: 240)
+        .accessibilityHidden(true)
+    }
+
+    private func letter(_ text: String, angle: Double) -> some View {
+        Text(text).font(.system(size: 64, weight: .medium, design: .serif))
+            .foregroundStyle(MarrowInk.ink)
+            .frame(width: 84, height: 108)
+            .background(MarrowInk.surface, in: RoundedRectangle(cornerRadius: 16))
+            .rotationEffect(.degrees(angle))
     }
 }

@@ -37,7 +37,7 @@ struct SpoonMendSheet: View {
                                 .frame(minWidth: MarrowSpace.hit, minHeight: MarrowSpace.hit)
                                 .contentShape(Rectangle())
                         }
-                        .buttonStyle(MarrowGlyphStyle())
+                        .buttonStyle(.plain)
                         .accessibilityLabel("Close")
                     }
                 }
@@ -48,13 +48,12 @@ struct SpoonMendSheet: View {
     private var populated: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: MarrowSpace.gap) {
-                Image(MarrowArt.twistHero)
-                    .marrowCutout(maxWidth: .infinity, maxHeight: MarrowSpace.step(22))
+                MarrowIllustration(page: 1)
                 Text("How it works")
                     .font(MarrowType.font(.display, size: typeSize))
                     .foregroundStyle(MarrowInk.ink)
                     .lineLimit(2)
-                Text("Maker or title paints as words. Two first letters trade. Word order stays. Tap a word that swapped its first letter. A miss greys that word and keeps the rest up.")
+                Text("Look at the artist or painting title. Two first letters have traded places, while the word order stays the same. Tap either changed word to restore both letters. A missed word is crossed out, so you can try another.")
                     .font(MarrowType.font(.body, size: typeSize))
                     .foregroundStyle(MarrowInk.ink)
                 if let work = desk.displayedWork {

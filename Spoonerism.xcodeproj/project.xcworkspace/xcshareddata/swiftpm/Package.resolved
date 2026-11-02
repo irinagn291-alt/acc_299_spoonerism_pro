@@ -1,12 +1,12 @@
 {
-  "originHash" : "522d50239e77c16531512563887180e35d302de29d8ef64ff5baa39494cf342c",
+  "originHash" : "3c478e816f778b2c3229580a7588cbc9cc0c49132d0dd8031a59765cafb77d4a",
   "pins" : [
     {
       "identity" : "alamofire",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/srfcsthpvf-prog/Alamofire",
+      "location" : "https://github.com/seanmarcusross-hue/Alamofire",
       "state" : {
-        "revision" : "3ea8e93ec37a3ae5f255afb529ef20f438dd1903"
+        "revision" : "9799237b84cbd97f80a3ac9b69b30ba65139f752"
       }
     },
     {

@@ -25,7 +25,7 @@ struct HeadButton: View {
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
                 .padding(.horizontal, MarrowSpace.card)
-                .frame(minHeight: MarrowSpace.hit, alignment: .leading)
+                .frame(minHeight: 52, alignment: .leading)
                 .contentShape(RoundedRectangle(cornerRadius: MarrowRadius.chip, style: .continuous))
         }
         .buttonStyle(HeadSeatStyle(phase: phase))
@@ -40,7 +40,7 @@ struct HeadButton: View {
         case .open:
             return head.spoken
         case .swapped:
-            return "\(head.spoken), first letter swapped"
+            return head.spoken
         case .righted:
             return "\(head.spoken), filed"
         case .muffed:
@@ -53,7 +53,7 @@ struct HeadButton: View {
         case .open:
             return "Files this word if it swapped its first letter."
         case .swapped:
-            return "Puts both first letters back."
+            return "Tests whether this word swapped its first letter."
         case .righted, .muffed:
             return "Already filed."
         }
@@ -96,10 +96,10 @@ private struct HeadSeatBody: View {
 
     private var fill: Color {
         switch phase {
-        case .open, .righted:
+        case .open, .swapped:
             return MarrowInk.surface
-        case .swapped:
-            return MarrowInk.accent
+        case .righted:
+            return MarrowInk.accent.opacity(0.10)
         case .muffed:
             return MarrowInk.muted.opacity(0.28)
         }
@@ -110,7 +110,7 @@ private struct HeadSeatBody: View {
         case .open, .righted:
             return MarrowInk.ink
         case .swapped:
-            return MarrowInk.surface
+            return MarrowInk.ink
         case .muffed:
             return MarrowInk.muted
         }
@@ -119,7 +119,7 @@ private struct HeadSeatBody: View {
     private var stroke: Color {
         if isFocused { return MarrowInk.ink }
         if phase == .muffed { return MarrowInk.ink.opacity(0.55) }
-        if phase == .righted || phase == .swapped { return MarrowInk.accent }
+        if phase == .righted { return MarrowInk.accent }
         return MarrowInk.ink.opacity(0.12)
     }
 

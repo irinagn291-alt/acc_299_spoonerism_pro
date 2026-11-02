@@ -39,7 +39,7 @@ struct SettingsView: View {
                                 .frame(minWidth: MarrowSpace.hit, minHeight: MarrowSpace.hit)
                                 .contentShape(Rectangle())
                         }
-                        .buttonStyle(MarrowGlyphStyle())
+                        .buttonStyle(.plain)
                         .accessibilityLabel("Close")
                     }
                 }

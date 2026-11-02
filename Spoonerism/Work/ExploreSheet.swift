@@ -21,7 +21,7 @@ struct ExploreView: View {
                     }
                 }
                 .background(MarrowInk.background.ignoresSafeArea())
-                .navigationTitle("Browse")
+                .navigationTitle("Gallery")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
@@ -34,7 +34,7 @@ struct ExploreView: View {
                                 .frame(minWidth: MarrowSpace.hit, minHeight: MarrowSpace.hit)
                                 .contentShape(Rectangle())
                         }
-                        .buttonStyle(MarrowGlyphStyle())
+                        .buttonStyle(.plain)
                         .accessibilityLabel("Close")
                     }
                     ToolbarItemGroup(placement: .keyboard) {
@@ -64,7 +64,8 @@ struct ExploreView: View {
                 .foregroundStyle(MarrowInk.muted)
                 .padding(.horizontal, MarrowSpace.outer)
             HStack(spacing: MarrowSpace.gap) {
-                TextField("Search a work", text: $desk.query)
+                Image(systemName: "magnifyingglass").foregroundStyle(MarrowInk.muted)
+                TextField("Search paintings or artists", text: $desk.query)
                     .font(MarrowType.font(.body, size: typeSize))
                     .foregroundStyle(MarrowInk.ink)
                     .textInputAutocapitalization(.never)
@@ -121,83 +122,64 @@ struct ExploreView: View {
 
     private var populated: some View {
         ScrollViewReader { proxy in
-            List {
-                Section {
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), spacing: 16)], spacing: 20) {
                     ForEach(desk.seekHits) { row in
                         Button {
                             searchFocused = false
                             Task { await desk.keepWork(row) }
                         } label: {
-                            HStack(alignment: .center, spacing: MarrowSpace.gap) {
-                                MarrowThumb(url: row.imageURL, side: MarrowSpace.step(7))
-                                VStack(alignment: .leading, spacing: MarrowSpace.inner) {
+                            VStack(alignment: .leading, spacing: 0) {
+                                QuizTile(work: Work.idle(from: row, daykey: desk.dayStamp), showSuccess: false)
+                                    .frame(height: 200)
+                                VStack(alignment: .leading, spacing: 8) {
                                     Text(row.title)
-                                        .font(MarrowType.font(.body, size: typeSize))
+                                        .font(.system(.title3, design: .serif).weight(.medium))
                                         .foregroundStyle(MarrowInk.ink)
-                                        .lineLimit(2)
+                                        .fixedSize(horizontal: false, vertical: true)
                                     Text(row.artist)
-                                        .font(MarrowType.font(.caption, size: typeSize))
+                                        .font(.subheadline)
                                         .foregroundStyle(MarrowInk.muted)
-                                        .lineLimit(1)
+                                    HStack {
+                                        Text(row.dated ?? "Prado collection").font(.caption)
+                                            .foregroundStyle(MarrowInk.muted)
+                                        Spacer()
+                                        if desk.stockingObjectID == row.objectID {
+                                            ProgressView().tint(MarrowInk.accent)
+                                        } else {
+                                            Label(isKept(row) ? "Saved" : "Save painting", systemImage: isKept(row) ? "checkmark.circle.fill" : "plus.circle")
+                                                .font(.caption.weight(.semibold))
+                                                .foregroundStyle(MarrowInk.accent)
+                                        }
+                                    }
+                                    .padding(.top, 8)
                                 }
-                                Spacer(minLength: MarrowSpace.gap)
-                                rackMark(for: row)
+                                .padding(16)
                             }
-                            .contentShape(Rectangle())
+                            .background(MarrowInk.surface)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                            .overlay(RoundedRectangle(cornerRadius: 20).stroke(MarrowInk.ink.opacity(0.06)))
                         }
                         .buttonStyle(MarrowRowStyle())
                         .disabled(desk.stockingObjectID != nil)
-                        .listRowBackground(rowBackground(for: row))
-                        .listRowSeparatorTint(MarrowInk.muted.opacity(0.35))
-                        .listRowInsets(
-                            EdgeInsets(
-                                top: MarrowSpace.gap,
-                                leading: MarrowSpace.outer,
-                                bottom: MarrowSpace.gap,
-                                trailing: MarrowSpace.outer
-                            )
-                        )
                         .id(row.objectID)
-                        .accessibilityLabel("\(row.title), \(row.artist)")
-                        .accessibilityHint("Saves this painting on this device.")
+                        .accessibilityLabel("\(row.title), \(row.artist), \(isKept(row) ? "saved" : "save painting")")
                     }
                 }
+                .padding(20)
+                .frame(maxWidth: 1100)
+                .frame(maxWidth: .infinity)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            .contentMargins(.bottom, MarrowSpace.outer)
-            .simultaneousGesture(
-                TapGesture().onEnded { searchFocused = false }
-            )
+            .scrollIndicators(.hidden)
             .onChange(of: desk.focusedObjectID) { _, objectID in
                 guard let objectID else { return }
-                if reduceMotion {
-                    proxy.scrollTo(objectID, anchor: .center)
-                } else {
-                    withAnimation(MarrowMotion.snap(reduceMotion)) {
-                        proxy.scrollTo(objectID, anchor: .center)
-                    }
-                }
+                withAnimation(MarrowMotion.snap(reduceMotion)) { proxy.scrollTo(objectID, anchor: .center) }
             }
         }
     }
 
-    private func rowBackground(for row: CatalogRow) -> Color {
-        if desk.focusedObjectID == row.objectID {
-            return MarrowInk.accent.opacity(0.12)
-        }
-        return MarrowInk.surface
-    }
-
-    @ViewBuilder
-    private func rackMark(for row: CatalogRow) -> some View {
-        if desk.onset.works.contains(where: { $0.objectID == row.objectID }) {
-            Image(systemName: "checkmark")
-                .font(MarrowType.font(.caption, size: typeSize))
-                .foregroundStyle(MarrowInk.ink)
-                .frame(width: MarrowSpace.hit, height: MarrowSpace.hit)
-                .accessibilityLabel("Already saved")
-        }
+    private func isKept(_ row: CatalogRow) -> Bool {
+        desk.onset.works.contains { $0.objectID == row.objectID }
     }
 
     private var emptyPage: some View {

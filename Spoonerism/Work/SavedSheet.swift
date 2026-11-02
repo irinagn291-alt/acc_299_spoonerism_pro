@@ -26,7 +26,7 @@ struct SavedView: View {
                     }
                 }
                 .background(MarrowInk.background.ignoresSafeArea())
-                .navigationTitle("Kept")
+                .navigationTitle("Collection")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
@@ -39,7 +39,7 @@ struct SavedView: View {
                                 .frame(minWidth: MarrowSpace.hit, minHeight: MarrowSpace.hit)
                                 .contentShape(Rectangle())
                         }
-                        .buttonStyle(MarrowGlyphStyle())
+                        .buttonStyle(.plain)
                         .accessibilityLabel("Close")
                     }
                 }
@@ -112,7 +112,7 @@ struct SavedView: View {
                 }
             }
         }
-        .listStyle(.plain)
+        .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .contentMargins(.bottom, MarrowSpace.outer)
     }
@@ -123,50 +123,29 @@ struct SavedView: View {
     }
 
     private var tally: some View {
-        HStack(alignment: .top, spacing: MarrowSpace.gap) {
-            VStack(alignment: .leading, spacing: MarrowSpace.inner) {
-                Text(MarrowCopy.filedLabel)
-                    .font(MarrowType.font(.caption, size: typeSize))
-                    .foregroundStyle(MarrowInk.muted)
-                    .lineLimit(1)
-                Text(MarrowFigures.whole(desk.onset.mendedWorks.count))
-                    .font(MarrowType.font(.title, size: typeSize).monospacedDigit())
-                    .foregroundStyle(MarrowInk.ink)
-                    .lineLimit(1)
-            }
-            .padding(MarrowSpace.card)
-            .frame(maxWidth: .infinity, minHeight: MarrowSpace.hit, alignment: .leading)
-            .marrowFlat()
-
-            VStack(alignment: .leading, spacing: MarrowSpace.inner) {
-                Text(MarrowCopy.hitsLabel)
-                    .font(MarrowType.font(.caption, size: typeSize))
-                    .foregroundStyle(MarrowInk.muted)
-                    .lineLimit(1)
-                Text(MarrowFigures.whole(desk.onset.reviewableMends.count))
-                    .font(MarrowType.font(.headline, size: typeSize).monospacedDigit())
-                    .foregroundStyle(MarrowInk.ink)
-                    .lineLimit(1)
-                Text(missLine)
-                    .font(MarrowType.font(.micro, size: typeSize).monospacedDigit())
-                    .foregroundStyle(MarrowInk.ink)
-                    .lineLimit(1)
-            }
-            .padding(MarrowSpace.card)
-            .frame(minWidth: MarrowSpace.step(14), maxWidth: MarrowSpace.step(18), minHeight: MarrowSpace.hit, alignment: .leading)
-            .marrowFlat(MarrowRadius.chip)
+        HStack(spacing: 12) {
+            collectionStat("Solved", count: desk.onset.mendedWorks.count)
+            collectionStat("Hits", count: desk.onset.reviewableMends.count)
+            collectionStat("Misses", count: desk.onset.reviewableMuffs.count)
         }
-        .padding(.horizontal, MarrowSpace.outer)
-        .padding(.vertical, MarrowSpace.gap)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(
-            "\(MarrowFigures.whole(desk.onset.mendedWorks.count)) filed, \(MarrowFigures.whole(desk.onset.reviewableMends.count)) hits, \(MarrowFigures.whole(desk.onset.reviewableMuffs.count)) misses"
-        )
+        .padding(.vertical, 16)
+    }
+
+    private func collectionStat(_ title: String, count: Int) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(MarrowFigures.whole(count))
+                .font(.system(.largeTitle, design: .serif).monospacedDigit())
+                .foregroundStyle(MarrowInk.ink)
+            Text(title).font(.caption).foregroundStyle(MarrowInk.muted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .marrowFlat()
     }
 
     private func mendedRow(_ work: Work) -> some View {
         HStack(alignment: .center, spacing: MarrowSpace.gap) {
-            MarrowThumb(url: work.imageURL, side: MarrowSpace.step(7))
+            MarrowThumb(url: work.imageURL, side: MarrowSpace.step(7), objectID: work.objectID)
             VStack(alignment: .leading, spacing: MarrowSpace.inner) {
                 Text(work.title)
                     .font(MarrowType.font(.body, size: typeSize))
@@ -175,13 +154,13 @@ struct SavedView: View {
                 Text(work.artist)
                     .font(MarrowType.font(.caption, size: typeSize))
                     .foregroundStyle(MarrowInk.muted)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                Text(MarrowFigures.daykey(work.daykey))
+                    .font(.caption2).foregroundStyle(MarrowInk.muted)
             }
             Spacer(minLength: MarrowSpace.gap)
-            Text(MarrowFigures.daykey(work.daykey))
-                .font(MarrowType.font(.micro, size: typeSize).monospacedDigit())
-                .foregroundStyle(MarrowInk.ink)
-                .lineLimit(1)
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(MarrowInk.accent)
         }
         .padding(.vertical, MarrowSpace.inner)
         .accessibilityElement(children: .combine)
@@ -206,10 +185,7 @@ struct SavedView: View {
                     .lineLimit(2)
             }
             Spacer(minLength: MarrowSpace.gap)
-            Text(MarrowFigures.daykey(stroke.daykey))
-                .font(MarrowType.font(.micro, size: typeSize).monospacedDigit())
-                .foregroundStyle(MarrowInk.ink)
-                .lineLimit(1)
+
         }
         .padding(.vertical, MarrowSpace.inner)
         .accessibilityElement(children: .combine)

@@ -73,22 +73,22 @@ struct OnboardingView: View {
         case 0:
             pageBody(
                 art: MarrowArt.onboarding1,
-                headline: "Save a painting.",
-                line: "Keep Prado works on this device. Home is the line, not a museum walk.",
+                headline: "A gallery to play with.",
+                line: "Discover the Prado collection and save a painting for your next round.",
                 showsSpacer: showsSpacer
             )
         case 1:
             pageBody(
                 art: MarrowArt.onboarding2,
-                headline: "Tap a swapped word.",
+                headline: "A twist of letters.",
                 line: "Two first letters trade. Word order stays. Tap a word that swapped its first letter.",
                 showsSpacer: showsSpacer
             )
         default:
             pageBody(
                 art: MarrowArt.onboarding3,
-                headline: "File the painting.",
-                line: "A true tap shelves it. Misses stay with kept paintings.",
+                headline: "Make it your collection.",
+                line: "Restore the words to complete a round. Your collection keeps every painting and your progress.",
                 showsSpacer: showsSpacer
             )
         }
@@ -96,8 +96,7 @@ struct OnboardingView: View {
 
     private func pageBody(art: String, headline: String, line: String, showsSpacer: Bool) -> some View {
         VStack(alignment: .leading, spacing: MarrowSpace.step(2)) {
-            Image(art)
-                .marrowCutout(maxWidth: .infinity, maxHeight: MarrowSpace.step(36))
+            MarrowIllustration(page: page)
             Text(headline)
                 .font(MarrowType.font(.display, size: typeSize))
                 .foregroundStyle(MarrowInk.ink)

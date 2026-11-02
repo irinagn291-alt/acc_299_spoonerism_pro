@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// Role: Onset. Named colours from Assets.xcassets. Hex lives only in this accessor: #424714 #656B30 #FFF6FC #E8FF2E #D5DB9E.
+/// Role: Onset. Named colours from Assets.xcassets. Hex lives only in this accessor: #F5F3ED #FFFFFF #182C26 #245C46 #65746A.
 enum MarrowInk {
     enum Hex {
-        static let background = "#424714"
-        static let surface = "#656B30"
-        static let ink = "#FFF6FC"
-        static let accent = "#E8FF2E"
-        static let muted = "#D5DB9E"
+        static let background = "#F5F3ED"
+        static let surface = "#FFFFFF"
+        static let ink = "#182C26"
+        static let accent = "#245C46"
+        static let muted = "#65746A"
     }
 
     static var background: Color { Color("background") }
@@ -36,7 +36,7 @@ enum MarrowType {
             if size >= .accessibility3 {
                 return .system(.title2, design: .default).weight(.semibold).leading(.tight)
             }
-            return .system(.title, design: .default).weight(.semibold).leading(.tight)
+            return .system(.largeTitle, design: .serif).weight(.medium).leading(.tight)
         case .title:
             return .system(.title3, design: .default).weight(.semibold).leading(.tight)
         case .headline:
@@ -74,7 +74,7 @@ enum MarrowRadius {
 
 /// Role: Onset. One soft drop-shadow. Only the Quiz hero sits above the field.
 enum MarrowLift {
-    static let shadeRadius: CGFloat = 16
+    static let shadeRadius: CGFloat = 12
     static let shadeY: CGFloat = 8
-    static var shade: Color { MarrowInk.ink.opacity(0.12) }
+    static var shade: Color { MarrowInk.ink.opacity(0.07) }
 }

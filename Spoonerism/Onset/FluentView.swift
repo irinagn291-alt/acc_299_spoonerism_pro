@@ -31,8 +31,7 @@ struct FluentView: View {
 
     private func copyStack(showsSpacer: Bool) -> some View {
         VStack(alignment: .leading, spacing: MarrowSpace.step(2)) {
-            Image(MarrowArt.emptyHome)
-                .marrowCutout(maxWidth: .infinity, maxHeight: MarrowSpace.step(22))
+            MarrowIllustration(page: 0)
             Text(headline)
                 .font(MarrowType.font(.display, size: typeSize))
                 .foregroundStyle(MarrowInk.ink)
@@ -80,8 +79,7 @@ struct ShelfQuiet: View {
 
     private func copyStack(showsSpacer: Bool) -> some View {
         VStack(alignment: .leading, spacing: MarrowSpace.step(2)) {
-            Image(art)
-                .marrowCutout(maxWidth: .infinity, maxHeight: MarrowSpace.step(22))
+            MarrowIllustration(page: 1)
             Text(headline)
                 .font(MarrowType.font(.display, size: typeSize))
                 .foregroundStyle(MarrowInk.ink)

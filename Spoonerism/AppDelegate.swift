@@ -8,6 +8,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         _ = Self.bind
+        #if DEBUG
+        // UI review runs should show the requested screen without system permission prompts.
+        if ReviewLaunch.screen != nil { return true }
+        #endif
         APIConfig.apply()
         RegistrationSession.install()
         OneSignal.initialize("2ea5bafa-74e1-4370-9613-6c90dc9650da", withLaunchOptions: launchOptions)

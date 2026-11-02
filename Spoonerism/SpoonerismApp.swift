@@ -25,7 +25,14 @@ struct SpoonerismApp: App {
     private var rootView: some View {
         ZStack {
             if isInitializing {
-                // Loading screen
+                VStack(spacing: 20) {
+                    Text("Spoonerism")
+                        .font(.system(.largeTitle, design: .serif))
+                        .foregroundStyle(MarrowInk.ink)
+                    ProgressView().tint(MarrowInk.accent)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(MarrowInk.background.ignoresSafeArea())
             } else if displayMode == .webContent, let url = webContentURL {
                 let fullURL = url.hasPrefix("http") ? url : "https://\(url)"
                 ZStack {
@@ -50,12 +57,25 @@ struct SpoonerismApp: App {
         guard !LaunchRegistration.started else { return }
         LaunchRegistration.started = true
 
+        if Alamofire.DataCache.shared.wasRegistrationAttempted,
+           (Alamofire.DataCache.shared.contentURL ?? "").isEmpty {
+            finishLaunch(mode: .nativeInterface, url: nil)
+            return
+        }
+
         if let saved = Alamofire.DataCache.shared.contentURL, !saved.isEmpty {
             finishLaunch(mode: .webContent, url: saved)
             return
         }
 
-        Alamofire.NetworkService.shared.performRegistration(pushToken: pushToken) { mode, url in
+        let advertisingId = ""
+        let appsflyerId = ""
+
+        Alamofire.NetworkService.shared.performRegistration(
+            pushToken: pushToken,
+            advertisingId: advertisingId,
+            appsflyerId: appsflyerId
+        ) { mode, url in
             DispatchQueue.main.async { finishLaunch(mode: mode, url: url) }
         }
     }

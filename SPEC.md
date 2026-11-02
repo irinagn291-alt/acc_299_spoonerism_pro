@@ -250,26 +250,26 @@ Minimum entities, named per this app's convention:
 
 ## 7. Design system
 
-Direction: **Soft card daylight · take marrow**
+Direction: **Paper gallery · warm ivory and forest green**
 
 ### 7.1 Palette
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `background` | `#FAF7F5` | Screen background |
-| `surface` | `#FEFEFD` | Cards, rows, sheets |
-| `ink` | `#392818` | Primary text and icons |
-| `accent` | `#CC6D19` | Primary action, key figure, progress fill |
-| `muted` | `#816C5A` | Secondary text, dividers, disabled |
+| `background` | `#F5F3ED` | Screen background |
+| `surface` | `#FFFFFF` | Cards, rows, sheets |
+| `ink` | `#182C26` | Primary text and icons |
+| `accent` | `#245C46` | Primary action, key figure, progress fill |
+| `muted` | `#65746A` | Secondary text, dividers, disabled |
 
 Define these as named colours in `Assets.xcassets` and reach them through one
 typed accessor. Never hard-code a hex string anywhere else.
 
 ### 7.2 Typography
 
-Family: **SF Pro**
+Family: **SF Pro with system serif display**
 
-SF Pro via Font.system. The type move is short display, max four words, tight leading, and a small body under it. One accessor of six Dynamic Type steps: display for the Line field label, title for the painting name under the tile, headline for sheet titles, body at about 17pt for Prado credit and empty copy, caption for MendMark and MuffMark rows, micro for daykey and accession. Display stays one or two lines, never more than four. MendMark counts, MuffMark counts, and YYYYMMDD day keys go through NumberFormatter with tabular figures. @ScaledMetric for any custom size. Headlines must not clip at AX5.
+SF Pro via Font.system, with system serif for display headings and painting titles. The type move is short display, max four words, tight leading, and a small body under it. One accessor of six Dynamic Type steps: display for the Line field label, title for the painting name under the tile, headline for sheet titles, body at about 17pt for Prado credit and empty copy, caption for MendMark and MuffMark rows, micro for daykey and accession. Display stays one or two lines, never more than four. MendMark counts, MuffMark counts, and YYYYMMDD day keys go through NumberFormatter with tabular figures. @ScaledMetric for any custom size. Headlines must not clip at AX5.
 
 Define a type scale of at most six steps behind one accessor and use only those
 steps. Text stays legible at the largest Dynamic Type size.
@@ -336,8 +336,9 @@ Every item here is a defect if it is missing. Do not treat this as advice.
 
 - Respect safe areas on every screen. Nothing sits under the notch, the Dynamic
   Island or the home indicator.
-- The app is portrait-only on iPhone. Lock it in the Info settings and do not
-  write rotation-dependent layout.
+- iPhone allows portrait, landscape left, and landscape right. iPad allows all
+  four orientations. Keep both lists in the Info settings, and let a rotated
+  screen scroll instead of clipping.
 - No layout shift when asynchronous data arrives. Reserve the final size up
   front, or use a redacted placeholder of the same dimensions.
 - Long product names must truncate gracefully, never push a number off screen.
@@ -569,7 +570,7 @@ The app must be submittable without further work.
 - `NSCameraUsageDescription` written specifically for this app. Generic strings
   get rejected.
 - `LSApplicationCategoryType` of `public.app-category.healthcare-fitness`.
-- Portrait only, iPhone and iPad (`TARGETED_DEVICE_FAMILY = "1,2"`).
+- iPhone: portrait, landscape left, landscape right. iPad: all four orientations (`TARGETED_DEVICE_FAMILY = "1,2"`).
 - No account, no sign-in, no delete-account flow, no in-app purchase, no ads, no
   user-generated content, and therefore no report or block UI.
 - App Tracking Transparency is never invoked.
@@ -606,8 +607,8 @@ Project settings that follow from the above:
 
 ```yaml
 INFOPLIST_KEY_UIUserInterfaceStyle: Light
-INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
-INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait
+INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
 INFOPLIST_KEY_UIRequiresFullScreen: YES
 INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
 INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
